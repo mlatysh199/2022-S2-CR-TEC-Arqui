@@ -103,7 +103,7 @@ def determinarImagen(data, subdata, subsubdata, color):
 # Procesa un medio de las imagenes.
 def procesamientoParte(rango):
   for i in range (rango[0],rango[1]):
-      procesar(rango[2], rango[3], rango[4],rango[5]+"/"+imagenes_nombres[i])
+      procesar(rango[2], rango[3], rango[4],rango[5]+"/"+rango[6][i])
 
 # Para multiprocessing
 if __name__ == "__main__":
@@ -123,7 +123,7 @@ if __name__ == "__main__":
   
   # Multiprocessing con dos cores debido a google colab.
   with Pool(2) as p:
-    p.map(procesamientoParte, [(min(MAX_RUN,len(imagenesNombres))*i//2,min(MAX_RUN,len(imagenesNombres))//2*(i+1), data, subdata, subsubdata, imgsP) for i in range(2)])
+    p.map(procesamientoParte, [(min(MAX_RUN,len(imagenesNombres))*i//2,min(MAX_RUN,len(imagenesNombres))//2*(i+1), data, subdata, subsubdata, imgsP, imagenesNombres) for i in range(2)])
 
   print("Procesamiento finalizando!!!")
   print("Duracion de fase 1: ", time.time() - inicio)
