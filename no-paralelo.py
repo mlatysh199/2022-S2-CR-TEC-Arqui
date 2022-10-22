@@ -88,6 +88,7 @@ def elegirCercano(lista, pos):
     if final != []: break
   return choice(final)
 
+# Determina el camino a una imagen dado un color.
 def determinarImagen(data, color):
   r, g, b = color[0]//FAC, color[1]//FAC, color[2]//FAC
   work = data
