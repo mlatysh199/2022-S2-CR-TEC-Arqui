@@ -9,12 +9,14 @@ import os
 TAM_DEFAULT = (32, 32)
 FAC = 5
 
-def crear_data():
+# Crea la base de la estructura de datos para guardar las entradas {color : caminoAImagen}
+def crearData():
   return [None]*(1 + 255//FAC)
 
-data = crear_data()
+data = crearData()
 
-def color_promedio(img):
+# Saca el color promedio de una imagen
+def colorPromedio(img):
   px = img.load()
   r, g, b = 0, 0, 0
   for x in range(img.width):
@@ -27,7 +29,8 @@ def color_promedio(img):
   del px
   return r//a, g//a, b//a
 
-def meter_data(data, color, img):
+# Meta la entrada {color, caminoAImagen} en la estructura de datos. Si faltan componentes a la estructura, se agregan.
+def meterData(data, color, img):
   r, g, b = color[0]//FAC, color[1]//FAC, color[2]//FAC
   if data[r] == None:
     data[r] = crear_data()
@@ -36,47 +39,46 @@ def meter_data(data, color, img):
     data[r][g] = crear_data()
   data[r][g][b] = img
 
+# Carga una imagen y le aplica procesamiento.
 def procesar(nombre):
   with Image.open(nombre).convert("RGB") as img:
     img = img.resize(TAM_DEFAULT)
-    promedio = color_promedio(img)
-    meter_data(data, promedio, nombre)
+    promedio = colorPromedio(img)
+    meterData(data, promedio, nombre)
     del img
 
-'''
-funcion que crea la imagen vacia
-recibe la original y saca sus dimensiones x y y
-creamos la vacia multiplicando el default por cada dimension de la original
-retornamos la vacia
-'''
+# Crea una imagen vacía
 def crearImagenVacia(imagenOriginal):
   x, y = imagenOriginal.size
   imagenVacia = Image.new("RGB",(x*TAM_DEFAULT[0],y*TAM_DEFAULT[1]))
   return imagenVacia
 
+# Reeplaza los pixeles del collage en la posición respectiva.
 def reemplazarPixeles(posXInicio,posYInicio,vacia,color):
-  with Image.open(determinar_imagen(data, color)) as img:
-
+  with Image.open(determinarImagen(data, color)) as img:
     img.resize(TAM_DEFAULT)
     vacia.paste(img, (posXInicio,posYInicio))
     del img
 
+# Maneja todo lo que es la creación del collage
 def recorrerPixeles(imagenOriginal):
+  # Redimensiomaniento.
   if imagenOriginal.width > imagenOriginal.height:
     scale = imagenOriginal.height/imagenOriginal.width
     imagenOriginal = imagenOriginal.resize((256, int(scale*256)))
   else:
     scale = imagenOriginal.width/imagenOriginal.height
     imagenOriginal = imagenOriginal.resize((int(scale*256), 256))
-  
   img = imagenOriginal.load()
   vacia = crearImagenVacia(imagenOriginal)
   mult = imagenOriginal.width*imagenOriginal.height
+  # Recorrimiento pixel por pixel
   for i in range(imagenOriginal.width):
     for j in range(imagenOriginal.height):
       reemplazarPixeles(i*TAM_DEFAULT[0],j*TAM_DEFAULT[1],vacia,img[i,j])
   return vacia
 
+# Eliga el color más cercano.
 def elegirCercano(lista, pos):
   final = []
   l = len(lista)
@@ -86,7 +88,7 @@ def elegirCercano(lista, pos):
     if final != []: break
   return choice(final)
 
-def determinar_imagen(data, color):
+def determinarImagen(data, color):
   r, g, b = color[0]//FAC, color[1]//FAC, color[2]//FAC
   work = data
   if work[r] == None:
@@ -103,16 +105,17 @@ def determinar_imagen(data, color):
     work = work[b]
   return work
 
-imgs_p = "/content/drive/MyDrive/imagenesPrueba/watercolor"
-imagenes_nombres = os.listdir(imgs_p) #variable con la carpeta
+imgsP = "/content/drive/MyDrive/imagenesPrueba/watercolor"
+imagenesNombres = os.listdir(imgsP) #variable con la carpeta
 
+# Fase que consiste en procesamiento de las imágenes iniciales.
 print("Iniciando fase 1...")
 
 MAX_RUN = 2000
 
 inicio = time.time()
-for i in range(min(MAX_RUN, len(imagenes_nombres))):
-  procesar(imgs_p+"/"+imagenes_nombres[i])
+for i in range(min(MAX_RUN, len(imagenesNombres))):
+  procesar(imgsP+"/"+imagenesNombres[i])
 
 print("Procesamiento finalizando!!!")
 print("Duracion de fase 1: ", time.time()-inicio)
@@ -121,6 +124,7 @@ print("Duracion de fase 1: ", time.time()-inicio)
 
 imagenACambiar = "/content/drive/MyDrive/marisco.jpg"
 
+# Fase que consiste en la creación del collage.
 print("Iniciando fase 2...")
 inicio = time.time()
 imagenACambiar = Image.open(imagenACambiar).convert("RGB")
