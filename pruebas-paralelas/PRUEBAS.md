@@ -10,4 +10,4 @@
 La fase 1 de procesamiento de imágenes duró: 60 segundos.
 
 * La prueba 1 (imagen de icpc1) duró: 347.98 segundos.
-* La prueba 2 (imagen de computerman) duró: 347.98 segundos.
+* La prueba 2 (imagen de computerman) duró: 447.76 segundos.
